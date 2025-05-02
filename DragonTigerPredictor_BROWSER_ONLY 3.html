@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dragon Tiger Predictor (Browser Only)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #fafafa; }
+        input, button { padding: 10px; margin: 10px; font-size: 16px; width: 80%; max-width: 400px; }
+        #prediction { margin-top: 20px; font-size: 24px; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <h2>Dragon Tiger Predictor</h2>
+    <p>Enter past results like: D T D Tie T...</p>
+    <input type="text" id="history" placeholder="D T D Tie T D D...">
+    <br>
+    <button onclick="predict()">Predict</button>
+    <div id="prediction">Prediction will appear here</div>
+
+    <script>
+        function predict() {
+            const input = document.getElementById("history").value.trim().toUpperCase();
+            const history = input.split(/[^A-Z]+/).filter(r => ["D", "T", "TIE"].includes(r));
+            if (history.length < 3) {
+                document.getElementById("prediction").textContent = "Enter at least 3 results.";
+                return;
+            }
+
+            let count = { D: 0, T: 0, TIE: 0 };
+            history.forEach(r => count[r]++);
+
+            let total = history.length;
+            let ratio = {
+                D: count.D / total,
+                T: count.T / total,
+                TIE: count.TIE / total
+            };
+
+            let prediction = "TIE";
+            let rand = Math.random();
+            if (rand < 0.45) {
+                prediction = (ratio.D < ratio.T) ? "Dragon" : "Tiger";
+            } else if (rand < 0.9) {
+                prediction = (ratio.T < ratio.D) ? "Tiger" : "Dragon";
+            }
+
+            const last = history[history.length - 1];
+            const secondLast = history[history.length - 2];
+            if (last !== secondLast && (last === "D" || last === "T")) {
+                prediction = (last === "D") ? "Tiger" : "Dragon";
+            }
+
+            document.getElementById("prediction").textContent = "Predicted: " + prediction;
+        }
+    </script>
+</body>
+</html>
